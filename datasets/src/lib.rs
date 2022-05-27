@@ -177,12 +177,12 @@ pub fn linnerud() -> Dataset<f64, f64> {
 ///
 /// # Reference:
 /// McNeil, D. R. (1977) Interactive Data Analysis. Wiley.
-pub fn cars() -> Dataset<f64, usize, Ix1> {
+pub fn cars() -> Dataset<f64, f64, Ix1> {
     let data = include_bytes!("../data/cars.csv.gz");
     let array = array_from_buf(&data[..]);
 
     let (data, targets) = (
-        array.slice(s![.., 0]).to_owned(),
+        array.slice(s![.., 0..1]).to_owned(),
         array.column(1).to_owned(),
     );
 
