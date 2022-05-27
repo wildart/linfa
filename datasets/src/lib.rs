@@ -16,6 +16,7 @@
 //! | winequality | The winequality dataset measures different properties of wine, such as acidity, and gives a scoring from 3 to 8 in quality. It was collected in the north of Portugal. | 441, 10, 1 | Multi-class classification | [here](https://archive.ics.uci.edu/ml/datasets/wine+quality) |
 //! | diabetes | The diabetes dataset gives samples of human biological measures, such as BMI, age, blood measures, and tries to predict the progression of diabetes. | 1599, 11, 1 | Regression | [here](https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html) |
 //! | linnerud | The linnerud dataset contains samples from 20 middle-aged men in a fitness club. Their physical capability, as well as biological measures are related. | 20, 3, 3 | Regression | [here](https://core.ac.uk/download/pdf/20641325.pdf) |
+//! | cars | The Cars dataset contains the speed of cars and the distances taken to stop, recorded in the 1920s. | 50, 1, 1 | Regression | [here](https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/cars)) |
 //!
 //! The purpose of this crate is to faciliate dataset loading and make it as simple as possible. Loaded datasets are returned as a
 //! [linfa::Dataset] structure with named features.
@@ -26,7 +27,7 @@
 //!
 //! To use one of the provided datasets in your project add the `linfa-datasets` crate to your `Cargo.toml` and enable the corresponding feature:
 //! ```ignore
-//! linfa-datasets = { version = "0.3.1", features = ["winequality"] }
+//! linfa-datasets = { version = "0.5.0", features = ["winequality"] }
 //! ```
 //!
 //! You can then use the dataset in your working code:
@@ -48,7 +49,8 @@ use ndarray_csv::Array2Reader;
     feature = "iris",
     feature = "diabetes",
     feature = "winequality",
-    feature = "linnerud"
+    feature = "linnerud",
+    feature = "cars"
 ))]
 fn array_from_buf(buf: &[u8]) -> Array2<f64> {
     // unzip file
@@ -160,6 +162,31 @@ pub fn linnerud() -> Dataset<f64, f64> {
     let feature_names = vec!["Chins", "Situps", "Jumps"];
 
     Dataset::new(input_array, output_array).with_feature_names(feature_names)
+}
+
+#[cfg(feature = "cars")]
+/// Read in `cars` dataset from dataset path.
+///
+/// Cars dataset contains 50 observations of the speed of cars and the distances taken to stop. Note that the data were recorded in the 1920s.
+///
+/// ## Features:
+/// Speed of the car (mph).
+///
+/// ## Targets:
+/// Stopping distance (ft).
+///
+/// # Reference:
+/// McNeil, D. R. (1977) Interactive Data Analysis. Wiley.
+pub fn cars() -> Dataset<f64, usize, Ix1> {
+    let data = include_bytes!("../data/cars.csv.gz");
+    let array = array_from_buf(&data[..]);
+
+    let (data, targets) = (
+        array.slice(s![.., 0]).to_owned(),
+        array.column(1).to_owned(),
+    );
+
+    Dataset::new(data, targets).with_feature_names(vec!["speed"])
 }
 
 #[cfg(test)]
@@ -291,5 +318,17 @@ mod tests {
         // get the mean per target: Weight, Waist, Pulse
         let mean_targets = ds.targets().mean_axis(Axis(0)).unwrap();
         assert_abs_diff_eq!(mean_targets, array![178.6, 35.4, 56.1]);
+    }
+
+    #[cfg(feature = "cars")]
+    #[test]
+    fn test_cars() {
+        let ds = cars();
+
+        // check that we have the right amount of data
+        assert_eq!((ds.nsamples(), ds.nfeatures(), ds.ntargets()), (50, 1, 1));
+
+        // check for feature names
+        assert_eq!(ds.feature_names(), vec!["speed"]);
     }
 }
