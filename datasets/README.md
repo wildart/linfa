@@ -16,6 +16,7 @@ Currently the following datasets are provided:
 | winequality | The winequality dataset measures different properties of wine, such as acidity, and gives a scoring from 3 to 8 in quality. It was collected in the north of Portugal. | 441, 10, 1 | Multi-class classification | [here](https://archive.ics.uci.edu/ml/datasets/wine+quality) |
 | diabetes | The diabetes dataset gives samples of human biological measures, such as BMI, age, blood measures, and tries to predict the progression of diabetes. | 1599, 11, 1 | Regression | [here](https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html) |
 | linnerud | The linnerud dataset contains samples from 20 middle-aged men in a fitness club. Their physical capability, as well as biological measures are related. | 20, 3, 3 | Regression | [here](https://core.ac.uk/download/pdf/20641325.pdf) |
+| cars | The Cars dataset contains the speed of cars and the distances taken to stop, recorded in the 1920s. | 50, 1, 1 | Regression | [here](https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/cars)) |
 
 The purpose of this crate is to faciliate dataset loading and make it as simple as possible. Loaded datasets are returned as a 
 [`linfa::Dataset`](https://docs.rs/linfa/latest/linfa/dataset/type.Dataset.html) structure with named features.
@@ -26,7 +27,7 @@ Additionally, this crate provides utility functions to randomly generate test da
 
 To use one of the provided datasets in your project add the `linfa-datasets` crate to your `Cargo.toml` and enable the corresponding feature:
 ```
-linfa-datasets = { version = "0.3.1", features = ["winequality"] }
+linfa-datasets = { version = "0.5.0", features = ["winequality"] }
 ```
 You can then use the dataset in your working code:
 ```rust
